@@ -6,7 +6,7 @@ gcc thread_test_1.c -o test -pthread
 #include <threads.h>
 #include <stdlib.h>
 
-static int test(void *arg);
+static int thread_entry(void *arg);
 
 int main(void)
 {
@@ -18,11 +18,13 @@ int main(void)
     thrd_t thread;
     int result;
 
-    thrd_create(&thread, test, "hello c11 thread with id: %lu.\n");
+    thrd_create(&thread, thread_entry, "hello c11 thread with id: %X.\n");
     
-    for (int i = 0; i < 1000; i++)
+    thrd_t thrd = thrd_current();
+    for (int i = 0; i < 5; i++)
     {
-        printf("\r%04d", i);
+        thrd_sleep(&(struct timespec){.tv_sec=1}, NULL);
+        printf("\r[%X] %04d", thrd, i);
     }
 
     if (thrd_join(thread, &result) == thrd_success)
@@ -37,14 +39,18 @@ int main(void)
     return 0;
 }
 
-static int 
-test(void *arg)
+int 
+thread_entry(void *arg)
 {
     thrd_t thrd = thrd_current();
     printf((const char*)arg, thrd);
     struct timespec t;
     t.tv_sec = 3;
-    thrd_sleep(&(struct timespec){.tv_sec=5}, NULL);
+    for (int i = 0; i < 5; i++)
+    {
+        thrd_sleep(&(struct timespec){.tv_sec=1}, NULL);
+        printf("\r[%X] %04d", thrd, i);
+    }
 
     return thrd_success;
 }
