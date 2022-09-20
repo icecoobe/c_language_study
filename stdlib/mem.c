@@ -4,6 +4,9 @@
 #include <time.h>
 #include <string.h>
 
+// TODO: aligned_alloc demo
+// https://blog.csdn.net/jin739738709/article/details/122992753
+
 int main(void)
 {
     char *str;
